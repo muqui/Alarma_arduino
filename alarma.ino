@@ -19,6 +19,7 @@ UniversalTelegramBot bot(BOTtoken, client);
 int Bot_mtbs = 15000; //Tiempo medio entre el escaneo de mensajes
 long Bot_lasttime;   //exploracion de el ultimo mensaje
 bool Start = false;
+int encendido = 1;  // cuando este en verdadero se activara la alarma
 String chat_id2;
 bool flag = false;
 
@@ -54,10 +55,20 @@ void handleNewMessages(int numNewMessages) {
     }
  
     if (text == "/opciones") {
-      String keyboardJson = "[[\"/SIRENA_On\", \"/SIRENA_Off\"],[\"/SIRENA_ESTADO\"]]";
+      String keyboardJson = "[[\"/ALARMA_ESTADO\"],[\"/ALARMA_On\", \"/ALARMA_Off\"],[\"/SIRENA_On\", \"/SIRENA_Off\"],[\"/SIRENA_ESTADO\"]]";
       bot.sendMessageWithReplyKeyboard(chat_id, "Selecciona una de las siguientes opciones:", "", keyboardJson, true);
     }
+
+     if (text == "/ALARMA_Off") {
+      encendido = 0;
+       digitalWrite(SIRENA,HIGH);
+      bot.sendMessage(chat_id, "ALARMA Off");
+    }
  
+    if (text == "/ALARMA_On") {
+      encendido = 1;
+      bot.sendMessage(chat_id, "ALARMA On");
+    }
     if (text == "/SIRENA_Off") {
       digitalWrite(SIRENA, HIGH);
       bot.sendMessage(chat_id, "SIRENA Off");
@@ -74,6 +85,15 @@ void handleNewMessages(int numNewMessages) {
       } 
       else {
         bot.sendMessage(chat_id, "SIRENA Off");
+      }
+    }
+    if(text == "/ALARMA_ESTADO"){
+       
+         if (encendido== false) {      
+         bot.sendMessage(chat_id, "ALARMA OFF");
+      } 
+      else {
+        bot.sendMessage(chat_id, "ALARMA ON");
       }
     }
   }
@@ -117,7 +137,10 @@ void setup() {
 
 void loop() {
   
-  sensores(&hiloSensores);
+     if(encendido == 1){
+         sensores(&hiloSensores);
+     }
+        
    telegram(&hiloTelegram);
  
 
@@ -159,7 +182,7 @@ int sensores(struct pt *pt) {
   // }
   
   do {
- 
+  
    value_1 =  digitalRead(MAGNETICO_1);
    value_2 =  digitalRead(MAGNETICO_2);
    value_3 =  digitalRead(MAGNETICO_3);
@@ -167,29 +190,29 @@ int sensores(struct pt *pt) {
    value_5 =  digitalRead(MAGNETICO_5);
      
 
-   if (value_1 == HIGH) // En HIGH se ACTIVA la alarma
+   if (value_1 == HIGH ) // En HIGH se ACTIVA la alarma
    {
     digitalWrite(SIRENA, LOW);
      bot.sendMessage(chat_id2, "SE ACTIVO SENSOR 1");
    }
    
-   if (value_2 == HIGH) // En HIGH se ACTIVA la alarma
+   if (value_2 == HIGH ) // En HIGH se ACTIVA la alarma
    {
     digitalWrite(SIRENA, LOW);
      bot.sendMessage(chat_id2, "SE ACTIVO SENSOR 2");
    }
    
-   if (value_3 == HIGH) // En HIGH se ACTIVA la alarma
+   if (value_3 == HIGH ) // En HIGH se ACTIVA la alarma
    {
     digitalWrite(SIRENA, LOW);
      bot.sendMessage(chat_id2, "SE ACTIVO SENSOR 3");
    }
-   if (value_4 == HIGH) // En HIGH se ACTIVA la alarma
+   if (value_4 == HIGH ) // En HIGH se ACTIVA la alarma
    {
     digitalWrite(SIRENA, LOW);
      bot.sendMessage(chat_id2, "SE ACTIVO SENSOR 4");
    }
-   if (value_5 == HIGH) // En HIGH se ACTIVA la alarma
+   if (value_5 == HIGH ) // En HIGH se ACTIVA la alarma
    {
     digitalWrite(SIRENA, LOW);
      bot.sendMessage(chat_id2, "SE ACTIVO SENSOR 5");
